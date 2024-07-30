@@ -7,6 +7,7 @@ import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
+import session from "express-session";
 // import { currentUserChecker } from "./middleware/authChecker";
 
 const app = express();
@@ -18,6 +19,14 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(
+  session({
+    secret: "your_secret_key",
+    resave: false,
+    saveUninitialized: false,
+    // cookie: { secure: true } // Uncomment in production
+  })
+);
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,

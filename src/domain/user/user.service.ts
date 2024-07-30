@@ -11,6 +11,7 @@ import {
   UpdateUserInput,
   UserAuthResponse,
 } from "./user.types";
+import { Session, SessionData } from "express-session";
 
 @Service()
 export class UserService {
@@ -37,8 +38,12 @@ export class UserService {
     return user;
   }
 
-  async loginUser(input: LoginInput): Promise<UserAuthResponse> {
+  async loginUser(
+    input: LoginInput,
+    session: Session & Partial<SessionData>
+  ): Promise<User> {
     const user = await this.userRepository.findOneBy({ email: input.email });
+
     if (!user) {
       throw new HttpError(401, "Invalid credentials");
     }
@@ -48,11 +53,15 @@ export class UserService {
       throw new HttpError(401, "Invalid credentials");
     }
 
-    const token = sign({ userId: user.id }, "your_secret_key", {
-      expiresIn: "1d",
+    session.userId = user.id;
+    await new Promise((resolve, reject) => {
+      session.save((err: any) => {
+        if (err) reject(err);
+        else resolve(null);
+      });
     });
 
-    return { user, token };
+    return user;
   }
 
   async updateUser(id: number, input: UpdateUserInput): Promise<User> {

@@ -19,7 +19,7 @@
       "resolveJsonModule": true,
       "strictPropertyInitialization": false
     },
-    "include": [".eslintrc.cjs", "**/*.js", "**/*.ts"],
+    "include": [".eslintrc.cjs", "**/*.js", "**/*.ts", "express.d.ts"],
     "exclude": ["node_modules", "dist"],
   }
   
