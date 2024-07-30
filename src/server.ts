@@ -1,7 +1,7 @@
-import express, { Request, Response } from "express";
+import { Request, Response } from "express";
 import AppDataSource from "./database/database";
+import app from "./app";
 
-const app = express();
 const port = 4000;
 
 app.get("/", (req: Request, res: Response) => {
