@@ -3,7 +3,7 @@ version: "3"
 services:
   db:
     image: postgres:latest
-    container_name: mypetconnect-db
+    container_name: starconnect-db
     environment:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
