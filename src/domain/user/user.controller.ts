@@ -14,7 +14,12 @@ import {
 import { Inject } from "typedi";
 import { Response } from "express";
 import { User } from "./user.entity";
-// import { RegisterInput, LoginInput, UpdateUserInput } from '../types';
+import {
+  RegisterUserInput,
+  LoginInput,
+  UpdateUserInput,
+  UserAuthResponse,
+} from "./user.types";
 import { UserService } from "./user.service";
 // import { AuthMiddleware } from '../middleware/AuthMiddleware';
 
@@ -31,13 +36,34 @@ export class UserController {
 
   @Get("/:id")
   //   @UseBefore(AuthMiddleware)
-  async getUserById(@Param("id") id: number): Promise<User | null> {
+  async getUserById(@Param("id") id: number): Promise<User> {
     return this.userService.getUserById(id);
+  }
+
+  @Post("/register")
+  @HttpCode(201)
+  async register(@Body() registerInput: RegisterUserInput): Promise<User> {
+    return this.userService.registerUser(registerInput);
+  }
+
+  @Post("/login")
+  @HttpCode(200)
+  async login(
+    @Body() loginInput: LoginInput,
+    @Res() res: Response
+  ): Promise<UserAuthResponse> {
+    const userAuthResponse = await this.userService.loginUser(loginInput);
+    const { user, token } = userAuthResponse;
+    res.cookie("token", token, { httpOnly: true });
+    return userAuthResponse;
   }
 
   @Put("/:id")
   //   @UseBefore(AuthMiddleware)
-  async updateUser(@Param("id") id: number, @Body() input: any): Promise<User> {
+  async updateUser(
+    @Param("id") id: number,
+    @Body() input: UpdateUserInput
+  ): Promise<User> {
     return this.userService.updateUser(id, input);
   }
 

@@ -2,16 +2,15 @@ import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
 import { Repository } from "typeorm";
 import { User } from "./user.entity";
-// import {RegisterInput, LoginInput, UserAuthResponse}
 import { hash, compare } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { HttpError } from "routing-controllers";
-
-interface RegisterUserInput {
-  email: string;
-  password: string;
-  [key: string]: any;
-}
+import {
+  LoginInput,
+  RegisterUserInput,
+  UpdateUserInput,
+  UserAuthResponse,
+} from "./user.types";
 
 @Service()
 export class UserService {
@@ -38,7 +37,7 @@ export class UserService {
     return user;
   }
 
-  async loginUser(input: any): Promise<any> {
+  async loginUser(input: LoginInput): Promise<UserAuthResponse> {
     const user = await this.userRepository.findOneBy({ email: input.email });
     if (!user) {
       throw new HttpError(401, "Invalid credentials");
@@ -56,14 +55,14 @@ export class UserService {
     return { user, token };
   }
 
-  async updateUser(id: number, input: any): Promise<User> {
+  async updateUser(id: number, input: UpdateUserInput): Promise<User> {
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
       throw new HttpError(404, "User not found");
     }
 
     if (input.password) {
-      input.passwordHash = await hash(input.password, 10);
+      user.passwordHash = await hash(input.password, 10);
       delete input.password;
     }
 
